@@ -1,0 +1,3 @@
+Windows Command Prompt: copy "C:\Users\islad.gemini\antigravity\playground\deep-galileo\time-machine.html" "index.html"
+PowerShell: Copy-Item -Path 'C:\Users\islad.gemini\antigravity\playground\deep-galileo\time-machine.html' -Destination 'index.html' -Force
+Git Bash: cp "/c/Users/islad/.gemini/antigravity/playground/deep-galileo/time-machine.html" index.html
