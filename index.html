@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Machine - Family Legacy Portal</title>
+    <meta name="description" content="An interactive time portal to explore family history starting from 1992">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --portal-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
+            --glow-primary: rgba(102, 126, 234, 0.8);
+            --glow-secondary: rgba(0, 242, 254, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --bg-dark: #0a0a1a;
+            --bg-darker: #050510;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-darker);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .stars,
+        .stars2,
+        .stars3 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .stars {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2"><circle cx="1" cy="1" r="1" fill="white" opacity="0.8"/></svg>') repeat;
+            animation: starsMove 200s linear infinite;
+        }
+
+        .stars2 {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="3"><circle cx="1.5" cy="1.5" r="1" fill="white" opacity="0.5"/></svg>') repeat;
+            animation: starsMove 100s linear infinite;
+        }
+
+        .stars3 {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="2" cy="2" r="1.5" fill="white" opacity="0.3"/></svg>') repeat;
+            animation: starsMove 150s linear infinite;
+        }
+
+        @keyframes starsMove {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-2000px);
+            }
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .time-portal {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 3rem;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .globe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(102, 126, 234, 0.4);
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+        }
+
+        .time-portal:hover .globe-container {
+            transform: scale(1.05);
+        }
+
+        .sphere-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-size: 200% 100%;
+            transition: opacity 1.5s ease;
+            box-shadow: inset -40px -40px 100px rgba(0, 0, 0, 0.9),
+                0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Disco Ball Texture */
+        .disco-layer {
+            background:
+                conic-gradient(from 0deg at 50% 50%, rgba(200, 200, 200, 0.9) 0deg, rgba(255, 255, 255, 1) 10deg, rgba(200, 200, 200, 0.9) 20deg),
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0px, rgba(255, 255, 255, 0.1) 2px, transparent 2px, transparent 10px),
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 0px, rgba(255, 255, 255, 0.1) 2px, transparent 2px, transparent 10px);
+            background-color: silver;
+            background-image:
+                linear-gradient(30deg, transparent 40%, rgba(255, 255, 255, 0.9) 45%, transparent 50%),
+                linear-gradient(-30deg, transparent 40%, rgba(255, 255, 255, 0.9) 45%, transparent 50%),
+                repeating-linear-gradient(0deg, #888 0px, #ccc 2px, #888 4px, #444 6px);
+            background-size: 200% 200%, 200% 200%, 20px 20px;
+            opacity: 1;
+            z-index: 2;
+            animation: spinDisco 10s linear infinite;
+            filter: contrast(1.5) brightness(1.2);
+        }
+
+        /* Globe Texture (Simulated High-Tech Earth) */
+        .earth-layer {
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent 20%),
+                url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Aurora_as_seen_by_IMAGE.jpg/640px-Aurora_as_seen_by_IMAGE.jpg'),
+                radial-gradient(circle, #0044cc, #001f3f);
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            z-index: 1;
+            transform: rotateY(180deg);
+            /* Start "reversed" */
+            transition: all 1.5s ease;
+            filter: hue-rotate(20deg) brightness(1.2);
+        }
+
+        @keyframes spinDisco {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 200% 100%;
+            }
+        }
+
+        @keyframes spinEarth {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .portal-active .disco-layer {
+            opacity: 0;
+            transform: scale(0.8) rotate(360deg);
+        }
+
+        .portal-active .earth-layer {
+            opacity: 1;
+            transform: rotateY(0deg) scale(1.1);
+            animation: spinEarth 20s linear infinite;
+            box-shadow: 0 0 100px var(--glow-secondary);
+        }
+
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 1s infinite alternate;
+            box-shadow: 0 0 10px white;
+        }
+
+        @keyframes twinkle {
+            0% {
+                transform: scale(0.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .content {
+            text-align: center;
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .title-line {
+            display: inline-block;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 80px var(--glow-primary);
+        }
+
+        @keyframes titleGlow {
+
+            0%,
+            100% {
+                filter: brightness(1) drop-shadow(0 0 20px var(--glow-primary));
+            }
+
+            50% {
+                filter: brightness(1.3) drop-shadow(0 0 40px var(--glow-primary));
+            }
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00f2fe;
+            box-shadow: 0 0 20px #00f2fe;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        .status-text {
+            color: var(--text-secondary);
+        }
+
+        .subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .coordinates {
+            display: inline-block;
+            margin-bottom: 3rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .coord-label {
+            color: var(--glow-primary);
+            margin-right: 0.5rem;
+            font-weight: 700;
+        }
+
+        .coord-value {
+            color: var(--text-primary);
+            letter-spacing: 1px;
+        }
+
+        .enter-button {
+            position: relative;
+            padding: 1.25rem 3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow:
+                0 10px 40px rgba(102, 126, 234, 0.4),
+                0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .enter-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow:
+                0 15px 60px rgba(102, 126, 234, 0.6),
+                0 0 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .enter-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .button-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .button-shimmer {
+            position: absolute;
+            top: -50%;
+            left: -100%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            50%,
+            100% {
+                left: 200%;
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .time-portal {
+                width: 280px;
+                height: 280px;
+            }
+
+            .portal-core {
+                width: 140px;
+                height: 140px;
+                margin-left: -70px;
+                margin-top: -70px;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .enter-button {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .coordinates {
+                font-size: 0.8rem;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .time-portal {
+                width: 220px;
+                height: 220px;
+                margin-bottom: 2rem;
+            }
+
+            .status-indicator {
+                font-size: 0.7rem;
+                padding: 0.6rem 1.2rem;
+            }
+
+            .time-portal {
+                width: 220px;
+                height: 220px;
+                margin-bottom: 2rem;
+            }
+
+            .status-indicator {
+                font-size: 0.7rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 325px;
+            /* TikTok width */
+            margin: 0 auto 2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .video-overlay-text {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            z-index: 10;
+            pointer-events: none;
+            /* Allow clicking the video */
+        }
+
+        /* Adjust title for overlay */
+        .video-overlay-text .main-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    <div class="container">
+        <div class="time-portal">
+            <div class="globe-container">
+                <div class="sphere-surface disco-layer"></div>
+                <div class="sphere-surface earth-layer"></div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="video-wrapper">
+                <div class="video-overlay-text">
+                    <h1 class="main-title"><span class="title-line">THE TIME MACHINE</span><span
+                            class="title-line">WORKS</span></h1>
+                </div>
+                <blockquote class="tiktok-embed"
+                    cite="https://www.tiktok.com/@leprechaun.social/video/7580215478224801038"
+                    data-video-id="7580215478224801038" style="max-width: 605px;min-width: 325px;">
+                    <section><a target="_blank" title="@leprechaun.social"
+                            href="https://www.tiktok.com/@leprechaun.social?refer=embed">@leprechaun.social</a>
+                        <p>The Time Machine Works</p><a target="_blank" title="♬ original sound"
+                            href="https://www.tiktok.com/music/original-sound-7580215478224801038?refer=embed">♬
+                            original sound</a>
+                    </section>
+                </blockquote>
+                <script async src="https://www.tiktok.com/embed.js"></script>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div><span class="status-text">PORTAL ACTIVE • 1992-2024</span>
+            </div>
+            <p class="subtitle">Journey through time to explore the legacy of a family</p>
+            <div class="coordinates"><span class="coord-label">COORDINATES:</span><span class="coord-value">41.18°N,
+                    113.36°W</span></div><button class="enter-button" id="enterPortal"><span class="button-text">ENTER
+                    THE PORTAL</span><span class="button-shimmer"></span></button>
+        </div>
+        <div class="particles"></div>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            initializePortal();
+        });
+
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                particle.style.cssText = ` position: absolute;
+
+                width: $ {
+                    Math.random() * 4+2
+                }
+
+                px;
+
+                height: $ {
+                    Math.random() * 4+2
+                }
+
+                px;
+                background: radial-gradient(circle, rgba(102, 126, 234, 0.8), rgba(0, 242, 254, 0.4));
+                border-radius: 50%;
+
+                left: $ {
+                    Math.random() * 100
+                }
+
+                %;
+
+                top: $ {
+                    Math.random() * 100
+                }
+
+                %;
+
+                animation: particleFloat $ {
+                    Math.random() * 10+10
+                }
+
+                s linear infinite;
+
+                animation-delay: $ {
+                    Math.random() * 5
+                }
+
+                s;
+                box-shadow: 0 0 10px rgba(102, 126, 234, 0.6);
+                `;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        const style = document.createElement('style');
+
+        style.textContent = ` @keyframes particleFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate($ {
+                        Math.random() * 200 - 100
+                    }
+
+                    px, -100vh) scale(0);
+                opacity: 0;
+            }
+        }
+
+        `;
+        document.head.appendChild(style);
+
+        function initializePortal() {
+            const enterButton = document.getElementById('enterPortal');
+            const portal = document.querySelector('.time-portal');
+            const globeContainer = document.querySelector('.globe-container');
+
+            // Add sparkles to disco ball
+            const discoLayer = document.querySelector('.disco-layer');
+
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.width = Math.random() * 5 + 2 + 'px';
+                sparkle.style.height = sparkle.style.width;
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                discoLayer.appendChild(sparkle);
+            }
+
+            enterButton.addEventListener('click', () => {
+                portal.classList.add('portal-active');
+                createEnergyBurst();
+                console.log('🎵 Playing transition sound...');
+
+                setTimeout(() => {
+                    // Coordinates from new KML: Lat 38.89735594, Lon -77.02170482
+                    window.open('https://earth.google.com/web/@38.89735594,-77.02170482,13.64a,2107d,30y,0h,0t,0r', '_blank');
+                }, 2000);
+            });
+
+            portal.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = portal.getBoundingClientRect();
+                const x = (e.clientX - left) / width - 0.5;
+                const y = (e.clientY - top) / height - 0.5;
+
+                globeContainer.style.transform = `rotateY(${x * 30}deg) rotateX(${-y * 30}deg)`;
+            });
+
+            portal.addEventListener('mouseleave', () => {
+                globeContainer.style.transform = 'rotateY(0deg) rotateX(0deg)';
+            });
+        }
+
+        function createEnergyBurst() {
+            const portal = document.querySelector('.time-portal');
+            const burstCount = 12;
+
+            for (let i = 0; i < burstCount; i++) {
+                const burst = document.createElement('div');
+                const angle = (360 / burstCount) * i;
+
+                burst.style.cssText = ` position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 4px;
+                height: 4px;
+                background: radial-gradient(circle, #00f2fe, #667eea);
+                border-radius: 50%;
+                transform-origin: center;
+                animation: burstExpand 0.8s ease-out forwards;
+
+                transform: rotate($ {
+                        angle
+                    }
+
+                    deg) translateX(0);
+                box-shadow: 0 0 20px #00f2fe;
+                `;
+
+                portal.appendChild(burst);
+                setTimeout(() => burst.remove(), 800);
+            }
+        }
+
+        const burstStyle = document.createElement('style');
+
+        burstStyle.textContent = ` @keyframes burstExpand {
+            0% {
+                transform: rotate(var(--angle, 0deg)) translateX(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: rotate(var(--angle, 0deg)) translateX(200px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes portalActivate {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+                filter: brightness(1.5);
+            }
+        }
+
+        `;
+        document.head.appendChild(burstStyle);
+
+        function showPortalMessage() {
+            const existingMessage = document.querySelector('.portal-message');
+
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.className = 'portal-message';
+            message.innerHTML = ` <div class="message-content"><div class="message-icon">✓</div><div class="message-text">Portal Calibrated</div><div class="message-subtext">Timeline: 1992-2024 • Ready for Journey</div></div>`;
+
+            message.style.cssText = ` position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            border-radius: 20px;
+            padding: 2rem 3rem;
+            z-index: 1000;
+            animation: messageSlideIn 0.4s ease-out;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+            0 0 40px rgba(102, 126, 234, 0.3);
+            `;
+
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.style.animation = 'messageSlideOut 0.4s ease-in forwards';
+                setTimeout(() => message.remove(), 400);
+            }
+
+                , 2000);
+        }
+
+        const messageStyle = document.createElement('style');
+
+        messageStyle.textContent = ` .message-content {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .message-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #00f2fe;
+            text-shadow: 0 0 20px #00f2fe;
+            animation: iconPulse 0.6s ease-in-out;
+        }
+
+        .message-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .message-subtext {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes messageSlideOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        @keyframes iconPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        `;
+        document.head.appendChild(messageStyle);
+
+        document.addEventListener('mousemove', (e) => {
+            const portal = document.querySelector('.time-portal');
+
+            const {
+                clientX, clientY
+            }
+
+                = e;
+
+            const {
+                innerWidth, innerHeight
+            }
+
+                = window;
+
+            const xRotation = ((clientY / innerHeight) - 0.5) * 10;
+            const yRotation = ((clientX / innerWidth) - 0.5) * 10;
+
+            portal.style.transform = `perspective(1000px) rotateX($ {
+                        xRotation
+                    }
+
+                    deg) rotateY($ {
+                        yRotation
+                    }
+
+                    deg)`;
+        });
+
+        console.log('🌀 Time Machine Portal Initialized');
+        console.log('📍 Coordinates: 41.18°N, 113.36°W');
+        console.log('⏰ Timeline: 1992-2024');
+        console.log('✨ Portal Status: ACTIVE');
+    </script>
+</body>
+
+</html>
